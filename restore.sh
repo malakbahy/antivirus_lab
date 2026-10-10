@@ -10,18 +10,12 @@ do
         if [ -f "$file" ]
         then
             filename=$(basename "$file")
-            echo "$i) $filename"
+            echo "$i: $filename"
             i=$((i + 1))
         fi
     done
 
-    echo "Enter the number of the file you want to restore (or 'q' to quit):"
-    read choice
-
-    if [ "$choice" = "q" ]
-    then
-        break
-    fi
+    read -p "Choose a file: " choice
 
     i=1
     selected_file=""
@@ -38,12 +32,13 @@ do
         fi
     done
 
-    if [ -n "$selected_file" ]; then
-        echo "Choose an action for '$selected_file':"
-        echo "1) Restore this file back into $DIR"
-        echo "2) Permanently delete this file from $MALICIOUS_DIR"
-        echo "3) Leave this file as-is"
-        read action_choice
+    if [ -n "$selected_file" ]
+    then
+        echo "For $selected_file:"
+        echo "1: Restore this file back into dir (it was a false positive)"
+        echo "2: Permanently delete this file from malicious_dir (it was genuinely malicious)"
+        echo "3: Go back "
+        read -p "> " action_choice
 
         case "$action_choice" in
             1)
@@ -53,9 +48,10 @@ do
             2)
                 rm "$MALICIOUS_DIR/$selected_file"
                 echo "$selected_file permanently deleted."
+                break
                 ;;
             3)
-                echo "Leave this file as-is."
+                continue
                 ;;
             *)
                 echo "Invalid choice."
